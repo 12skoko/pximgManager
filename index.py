@@ -24,17 +24,43 @@ def get_illust_data(id):
     html_temp = BeautifulSoup(html, 'html.parser')
     content = html_temp.select('meta[id="meta-preload-data"]')
     content=str(content)
-    re_id=re.compile(',"illust":\{"(\w*?)":\{"illustId":"')
-    id=re.search(re_id,content)
     illust_data=[]
-    illust_data[0]=id[1]
-    print(id[1])
+    re_1=re.compile(',"id":"(.*?)","title":"(.*?)","description":"(.*?)","illustType":0,"createDate":"(.*?)","uploadDate":"')
+    part1=re.search(re_1,content)
+    re_2=re.compile('"storableTags":\[.*?\],"userId":"(.*?)","userName":"(.*?)","userAccount":".*?","userIllusts":')
+    part2=re.search(re_2,content)
+    re_3=re.compile('"likeData":.*?,"width":(.*?),"height":(.*?),"pageCount":(.*?),"bookmarkCount":(.*?),"likeCount":(.*?),"commentCount":(.*?),"responseCount":.*?,"viewCount":(.*?),')
+    part3=re.search(re_3,content)
+    illust_data.append(part1[1])
+    illust_data.append(part3[3])
+    illust_data.append(part1[2])
+    illust_data.append(part2[1])
+    illust_data.append(part2[2])
+    illust_data.append(part3[1])
+    illust_data.append(part3[2])
+    illust_data.append(part3[4])
+    illust_data.append(part3[5])
+    illust_data.append(part3[6])
+    illust_data.append(part3[7])
+    illust_data.append(part1[4])
+    illust_data.append(part1[3])
+    for i in range(0,13):
+        print(illust_data[i])
+    return illust_data
 
-    # print(html)
 
 
-
-get_illust_data(70441587)
+list=readname()
+list=str(list)
+re_num=re.compile('\((\w*)\)')
+list_num=re.search(re_num,list)
+try:
+    for i in range(1,1000):
+        print(list_num[i])
+except:
+    print('end')
+# for i in list:
+    # print(i)
 
 
 
