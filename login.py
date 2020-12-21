@@ -19,6 +19,8 @@ def login(id, password):
     post_key = []
     post_key_html = se.get(login_url, headers=headers).text
     post_key_soup = BeautifulSoup(post_key_html, 'html.parser')
+    print(post_key_soup)
+    exit(1)
     post_key = post_key_soup.find('input')['value']
     # 上面是去捕获postkey
     datas = {
@@ -54,6 +56,6 @@ def login(id, password):
     print(cc)
 
 
-ra=random.randint(0,1)
-login('sakuraihatto@outlook.com', '1458987208')
+# ra=random.randint(0,1)
+# login('sakuraihatto@outlook.com', '1458987208')
 login('Small_Week@outlook.com', '1458987208')
