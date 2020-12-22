@@ -1,7 +1,0 @@
-#LWP-Cookies-2.0
-Set-Cookie3: PHPSESSID=0lvj3ec6qtdsg565thpl2fgtnvf1q3ld; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2020-12-18 16:54:16Z"; HttpOnly=None; version=0
-Set-Cookie3: __cf_bm="a9dec51098d89c22dace012eeb45f8496d3aaf02-1608306856-1800-Ad90X24bTJniPsysJWwUHTxUgkZ37/Sg4ERJ/vyzz7cho3ouzmekGe1TXn5N9xWaQfWOKF7ktIQL3fczwbEVgy4="; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2020-12-18 16:24:16Z"; HttpOnly=None; SameSite=None; version=0
-Set-Cookie3: __cfduid=da0fda531e956399eec126317a1e18bf81608306856; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2021-01-17 15:54:16Z"; HttpOnly=None; SameSite=Lax; version=0
-Set-Cookie3: p_ab_d_id=1892662328; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2025-12-17 15:54:16Z"; version=0
-Set-Cookie3: p_ab_id=0; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2025-12-17 15:54:16Z"; version=0
-Set-Cookie3: p_ab_id_2=8; path="/"; domain=".pixiv.net"; path_spec; domain_dot; secure; expires="2025-12-17 15:54:16Z"; version=0
