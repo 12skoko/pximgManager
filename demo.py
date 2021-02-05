@@ -12,6 +12,8 @@ import time
 def readname():
     filePath = r'F:\pixiv\[bookmark] Public'
     name = os.listdir(filePath)
+    print(name)
+    exit()
     name = str(name)
     return name
 
@@ -79,7 +81,8 @@ def get_illust_data(id):
 def findname(id):
     data = []
     list = readname()
-    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?\.jpg|\.jpg|_p\w*?\.png|\.png)'
+
+    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?)*?(\.jpg|\.png)'
     re_name = re.compile(re_str)
     name = re.findall(re_name, list)
     data.append(len(name))
