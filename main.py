@@ -166,7 +166,9 @@ def main():
                     try:
                         c.execute(sqlstringexecute)
                     except:
-                        if judge(list_num[i])>0:
+                        f1=judge(list_num[i])
+                        print(f1)
+                        if f1>0:
                             continue
                         else:
                             try:
@@ -176,9 +178,14 @@ def main():
                                 ct = conn.cursor()
                                 ct.execute(sqlstringexecute)
                             except:
-                                print(sqlstringexecute)
-                                print(judge(list_num[i]))
-                                exit(25565)
+
+                                f2=judge(list_num[i])
+                                if f2>0:
+                                    continue
+                                else:
+                                    print(sqlstringexecute)
+                                    conn.close()
+                                    exit(25565)
                     # time.sleep(0.1)
                 else:
                     print('                        repeated')
