@@ -1,5 +1,5 @@
 import requests
-from pixivpy3 import *
+import random
 import re
 from bs4 import BeautifulSoup
 import os
@@ -15,9 +15,8 @@ def readdir():
 
 
 def readname(path):
-    path_temp="Z:\\tu\\pixiv\\"+path
+    path_temp = "Z:\\tu\\pixiv\\" + path
     filePath = path_temp
-    # print(filePath)
     name = os.listdir(filePath)
     name = str(name)
     return name
@@ -25,7 +24,7 @@ def readname(path):
 
 def readnumlist(path):
     list = readname(path)
-    re_num = re.compile('\((\w*)\).*?(\.jpg|\.png)')
+    re_num = re.compile('\((\w*)\).*?(\.jpg|\.png|\.gif|\.zip)')
     list_num_temp = re.findall(re_num, list)
     list_num = []
     lens = len(list_num_temp)
@@ -34,7 +33,7 @@ def readnumlist(path):
     return list_num
 
 
-def get_illust_data(id):
+def get_illust_data(id, path):
     se = requests.session()
     head = {
         'Referer': 'https://accounts.pixiv.net/login?lang=zh&source=pc&view_type=page&ref=wwwtop_accounts_index',
@@ -42,7 +41,7 @@ def get_illust_data(id):
         'accept-language': 'zh-CN,zh;q=0.9'
     }
     url = 'https://www.pixiv.net/artworks/' + str(id)
-    html = se.get(url, headers=head).text
+    html = se.get(url, headers=head, proxies=proxypool()).text
     html_temp = BeautifulSoup(html, 'html.parser')
     content = html_temp.select('meta[id="meta-preload-data"]')
     content = str(content)
@@ -52,7 +51,8 @@ def get_illust_data(id):
     re_2 = re.compile('"storableTags":\[.*?\],"userId":"(.*?)","userName":"(.*?)","userAccount":".*?","userIllusts":')
     re_3 = re.compile(
         '"likeData":.*?,"width":(.*?),"height":(.*?),"pageCount":(.*?),"bookmarkCount":(.*?),"likeCount":(.*?),"commentCount":(.*?),"responseCount":.*?,"viewCount":(.*?),')
-    re_tag = re.compile('\{\"tag\":\"([^\"]*?)\",\"locked\":(true|false),\"deletable\":(true|false)(,\"userId\":\"\d*?\")?(,\"translation\":{\"[^\"]*?\":\"(.*?)\"\})?')
+    re_tag = re.compile(
+        '\{\"tag\":\"([^\"]*?)\",\"locked\":(true|false),\"deletable\":(true|false)(,\"userId\":\"\d*?\")?(,\"translation\":{\"[^\"]*?\":\"(.*?)\"\})?')
 
     try:
         part1 = re.search(re_1, content)
@@ -62,9 +62,9 @@ def get_illust_data(id):
         tags = ''
         for i in tags_temp:
             tags += i[0]
-            print(i[0], end='')
+            # print(i[0], end='')
             if i[5] != '':
-                print('(' + i[5] + ')')
+                # print('(' + i[5] + ')')
                 tags += '(' + i[5] + ')'
             tags += ','
         tags.strip(',')
@@ -84,46 +84,53 @@ def get_illust_data(id):
         illust_data.append(part1[3])
         return illust_data
     except:
-        data = findname(id)
+        data = findname(id, path)
         illust_data.append(id)
         illust_data.append(data[0])
         illust_data.append(data[1])
-        for i in range(3, 13):
-            if i == 4 or i == 11 or i == 12:
-                illust_data.append('')
-            else:
-                illust_data.append(0)
+        illust_data.append(data[2])
+        illust_data.append(data[3])
+        for i in range(5, 11):
+            illust_data.append(0)
+        for i in range(11, 14):
+            illust_data.append('')
         return illust_data
 
 
-def findname(id):
+def findname(id, path):
     data = []
-    list = readname()
-    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?\.jpg|\.jpg|_p\w*?\.png|\.png)'
+    list = readname(path)
+    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?)*?(\.jpg|\.png|\.gif|\.zip)'
     re_name = re.compile(re_str)
     name = re.findall(re_name, list)
+
     data.append(len(name))
     data.append(name[0][0])
+    re_auth = re.compile('\((\d*?)\)(.*)')
+    auth = re.search(re_auth, path)
+    data.append(auth[1])
+    data.append(auth[2])
     return data
 
 
 def judge(id):
     conntemp = sqlite3.connect("pixiv.db")
     ctemp = conntemp.cursor()
-    sqlstr = 'select count(*)  from bookmark where id = ' + str(id) + ';'
+    sqlstr = 'select count(*)  from follow where id = ' + str(id) + ';'
     a = ctemp.execute(sqlstr)
     count = 0
     for i in a:
         count = i[0]
     conntemp.close()
+    # print count
     return count
 
 
 def sqlstring(illust_data):
-    string = "insert into follow(id,pageCount,name,author_id,auther_name,width,height,bookmarkCount,likeCount,commentCount,viewCount,createtime,tags,descriotion)"
+    string = "insert into follow(id,pageCount,name,author_id,author_name,width,height,bookmarkCount,likeCount,commentCount,viewCount,createtime,tags,introduction)"
     string += "values("
     for i in range(0, 13):
-        if i == 2 or i == 4 or i == 11 or i==12:
+        if i == 2 or i == 4 or i == 11 or i == 12:
             string += "'"
             string += str(illust_data[i]) + "',"
         else:
@@ -132,34 +139,53 @@ def sqlstring(illust_data):
     return string
 
 
+def proxypool():
+    a = random.randint(1, 9)
+    proxy = {"http": "http://192.168.2.91:308" + str(a)}
+    return proxy
+
+
 def main():
     conn = sqlite3.connect("pixiv.db")
     c = conn.cursor()
-    userdir=readdir()
-
+    userdir = readdir()
+    dirnum = len(userdir)
+    t = 0
     for m in userdir:
+        print('author\n' + str(t + 1) + '/' + str(dirnum))
         list_num = readnumlist(m)
         num = len(list_num)
         for i in range(0, num):
-            print(str(i + 1) + '/' + str(num))
-            print(list_num[i])
-
-            #
-            # if i == 0 or list_num[i] != list_num[i - 1]:
-            #     flag = judge(list_num[i])
-            #     if flag == 0:
-            #         illust_data = get_illust_data(list_num[i])
-            #         sqlstringexecute = sqlstring(illust_data)
-            #         c.execute(sqlstringexecute)
-            #         time.sleep(0.1)
-            #     else:
-            #         print('repeated')
-            # else:
-            #     pass
+            print('            ' + str(i + 1) + '/' + str(num))
+            print('            ' + list_num[i])
+            if i == 0 or list_num[i] != list_num[i - 1]:
+                flag = judge(list_num[i])
+                if flag == 0:
+                    illust_data = get_illust_data(list_num[i], m)
+                    sqlstringexecute = sqlstring(illust_data)
+                    try:
+                        c.execute(sqlstringexecute)
+                    except:
+                        try:
+                            conn.commit()
+                            conn.close()
+                            conn = sqlite3.connect("pixiv.db")
+                            ct = conn.cursor()
+                            ct.execute(sqlstringexecute)
+                        except:
+                            print(sqlstringexecute)
+                            exit(25565)
+                    # time.sleep(0.1)
+                else:
+                    print('                        repeated')
+            else:
+                pass
             if i % 10 == 0:
                 conn.commit()
                 print('committed')
-
+        t += 1
+        conn.commit()
+        print('committed')
     conn.commit()
     conn.close()
     print('complete')
@@ -167,6 +193,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # a=readdir()
-    # for i in a:
-    #     print(i)
+    # print(proxypool())

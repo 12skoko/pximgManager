@@ -1,5 +1,3 @@
-
-
 import requests
 from pixivpy3 import *
 import re
@@ -81,8 +79,7 @@ def get_illust_data(id):
 def findname(id):
     data = []
     list = readname()
-
-    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?)*?(\.jpg|\.png)'
+    re_str = '\(' + str(id) + '\)(.*?)(_p\w*?\.jpg|\.jpg|_p\w*?\.png|\.png)'
     re_name = re.compile(re_str)
     name = re.findall(re_name, list)
     data.append(len(name))
@@ -95,7 +92,7 @@ def judge(id):
     ctemp = conntemp.cursor()
     sqlstr = 'select count(*)  from bookmark where id = ' + str(id) + ';'
     a = ctemp.execute(sqlstr)
-    count=0
+    count = 0
     for i in a:
         count = i[0]
     conntemp.close()
@@ -120,13 +117,12 @@ def main():
     c = conn.cursor()
     list_num = readnumlist()
     num = len(list_num)
-
     for i in range(0, num):
         print(str(i + 1) + '/' + str(num))
         print(list_num[i])
         if i == 0 or list_num[i] != list_num[i - 1]:
-            flag=judge(list_num[i])
-            if flag==0:
+            flag = judge(list_num[i])
+            if flag == 0:
                 illust_data = get_illust_data(list_num[i])
                 sqlstringexecute = sqlstring(illust_data)
                 c.execute(sqlstringexecute)
@@ -138,10 +134,10 @@ def main():
         if i % 10 == 0:
             conn.commit()
             print('committed')
-
     conn.commit()
     conn.close()
     print('complete')
+
 
 if __name__ == '__main__':
     main()
