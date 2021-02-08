@@ -166,15 +166,19 @@ def main():
                     try:
                         c.execute(sqlstringexecute)
                     except:
-                        try:
-                            conn.commit()
-                            conn.close()
-                            conn = sqlite3.connect("pixiv.db")
-                            ct = conn.cursor()
-                            ct.execute(sqlstringexecute)
-                        except:
-                            print(sqlstringexecute)
-                            exit(25565)
+                        if judge(list_num[i])>0:
+                            continue
+                        else:
+                            try:
+                                conn.commit()
+                                conn.close()
+                                conn = sqlite3.connect("pixiv.db")
+                                ct = conn.cursor()
+                                ct.execute(sqlstringexecute)
+                            except:
+                                print(sqlstringexecute)
+                                print(judge(list_num[i]))
+                                exit(25565)
                     # time.sleep(0.1)
                 else:
                     print('                        repeated')
@@ -193,4 +197,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # print(proxypool())
