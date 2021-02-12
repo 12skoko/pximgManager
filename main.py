@@ -41,7 +41,21 @@ def get_illust_data(id, path):
         'accept-language': 'zh-CN,zh;q=0.9'
     }
     url = 'https://www.pixiv.net/artworks/' + str(id)
-    html = se.get(url, headers=head, proxies=proxypool()).text
+    try:
+        html = se.get(url, headers=head, proxies=proxypool()).text
+    except:
+        try:
+            print('html error 1')
+            time.sleep(1)
+            html = se.get(url, headers=head, proxies=proxypool()).text
+        except:
+            try:
+                print('html error 2')
+                time.sleep(60)
+                html = se.get(url, headers=head, proxies=proxypool()).text
+            except:
+                print('error')
+                exit(25567)
     html_temp = BeautifulSoup(html, 'html.parser')
     content = html_temp.select('meta[id="meta-preload-data"]')
     content = str(content)
@@ -130,12 +144,22 @@ def sqlstring(illust_data):
     string = "insert into follow(id,pageCount,name,author_id,author_name,width,height,bookmarkCount,likeCount,commentCount,viewCount,createtime,tags,introduction)"
     string += "values("
     for i in range(0, 13):
-        if i == 2 or i == 4 or i == 11 or i == 12:
-            string += "'"
-            string += str(illust_data[i]) + "',"
+        if i == 2 or i == 4 or i == 11 or i == 12 or i == 13:
+            flag = "'"
+            if flag in illust_data[i]:
+                string += '"' + str(illust_data[i]) + '"'
+                if i != 13:
+                    string += ','
+                else:
+                    string += ');'
+            else:
+                string += "'" + str(illust_data[i]) + "'"
+                if i != 13:
+                    string += ','
+                else:
+                    string += ');'
         else:
             string += str(illust_data[i]) + ","
-    string += "'" + str(illust_data[13]) + "');"
     return string
 
 
@@ -166,9 +190,9 @@ def main():
                     try:
                         c.execute(sqlstringexecute)
                     except:
-                        f1=judge(list_num[i])
+                        f1 = judge(list_num[i])
                         print(f1)
-                        if f1>0:
+                        if f1 > 0:
                             continue
                         else:
                             try:
@@ -179,8 +203,8 @@ def main():
                                 ct.execute(sqlstringexecute)
                             except:
 
-                                f2=judge(list_num[i])
-                                if f2>0:
+                                f2 = judge(list_num[i])
+                                if f2 > 0:
                                     continue
                                 else:
                                     print(sqlstringexecute)
@@ -193,14 +217,17 @@ def main():
                 pass
             if i % 10 == 0:
                 conn.commit()
-                print('committed')
+                print('                        committed')
         t += 1
         conn.commit()
-        print('committed')
+        print('                        committed')
     conn.commit()
     conn.close()
     print('complete')
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    # 84757203
+    illust_data = get_illust_data(84757203, '(45950563)ゆうぐれ')
+    print(sqlstring(illust_data))
