@@ -143,7 +143,7 @@ def judge(id):
 def sqlstring(illust_data):
     string = "insert into follow(id,pageCount,name,author_id,author_name,width,height,bookmarkCount,likeCount,commentCount,viewCount,createtime,tags,introduction)"
     string += "values("
-    for i in range(0, 13):
+    for i in range(0, 14):
         if i == 2 or i == 4 or i == 11 or i == 12 or i == 13:
             flag = "'"
             if flag in illust_data[i]:
